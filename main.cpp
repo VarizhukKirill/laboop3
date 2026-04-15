@@ -3,258 +3,516 @@
 #include <fstream>
 #include <ctime>
 #include <iomanip>
-#include <cmath>
-#include <vector>
-#include <cstdlib>
 
 using namespace std;
 
 
-enum ErrorState {
-    OK = 0,
-    MEMORY_ERR = 1,
-    OUT_OF_BOUNDS = 2,
-    INCOMPATIBLE_DIM = 3,
-    DIV_ZERO = 4
-};
-
-
 class Rectangle {
 private:
+    // Поля класу
     double height;
     double width;
     string color;
 
 public:
-    Rectangle() : height(1.0), width(1.0), color("White") {}
+    // Конструктор №1: без параметрів
+    Rectangle() {
+        height = 1.0;
+        width = 1.0;
+        color = "White";
+    }
 
+    // Конструктор №2: з параметрами
     Rectangle(double h, double w, string c) {
-        if (!setHeight(h)) height = 1.0;
-        if (!setWidth(w)) width = 1.0;
+        // Перевірка висоти
+        if (h > 0) {
+            height = h;
+        } else {
+            height = 1.0;
+        }
+
+        // Перевірка ширини
+        if (w > 0) {
+            width = w;
+        } else {
+            width = 1.0;
+        }
+
         color = c;
     }
 
-    bool setHeight(double h) {
-        if (h > 0) { height = h; return true; }
-        return false;
-    }
-
-    bool setWidth(double w) {
-        if (w > 0) { width = w; return true; }
-        return false;
-    }
-
-    void setColor(string c) { color = c; }
-    double getHeight() const { return height; }
-    double getWidth() const { return width; }
-    string getColor() const { return color; }
-
-    double area() const { return height * width; }
-    double perimeter() const { return 2 * (height + width); }
-
-    void print() const {
-        cout << "\n  дані вашого прямокут" << endl;
-        cout << "  Колір: " << color << " | Розміри: " << width << " x " << height << endl;
-        cout << "  Площа: " << area() << " | Периметр: " << perimeter() << endl;
-        cout << "  ------------------------------------------" << endl;
-    }
-};
-
-
-class DoubleVector {
-private:
-    double* data;
-    int size;
-    int state;
-    static int vectorObjects;
-
-public:
-    static int getCount() { return vectorObjects; }
-
-    DoubleVector() : size(1), state(OK) {
-        data = new (nothrow) double[1]{0.0};
-        if (!data) state = MEMORY_ERR;
-        vectorObjects++;
-    }
-
-    DoubleVector(int s) : size(s > 0 ? s : 1), state(OK) {
-        data = new (nothrow) double[size]();
-        if (!data) state = MEMORY_ERR;
-        vectorObjects++;
-    }
-
-    DoubleVector(int s, double val) : size(s > 0 ? s : 1), state(OK) {
-        data = new (nothrow) double[size];
-        if (!data) state = MEMORY_ERR;
-        else for (int i = 0; i < size; i++) data[i] = val;
-        vectorObjects++;
-    }
-
-    DoubleVector(const DoubleVector& other) : size(other.size), state(other.state) {
-        data = new double[size];
-        for (int i = 0; i < size; i++) data[i] = other.data[i];
-        vectorObjects++;
-    }
-
-    DoubleVector& operator=(const DoubleVector& other) {
-        if (this != &other) {
-            delete[] data;
-            size = other.size;
-            state = other.state;
-            data = new double[size];
-            for (int i = 0; i < size; i++) data[i] = other.data[i];
+    // Функція встановлення висоти
+    void setHeight(double h) {
+        if (h > 0) {
+            height = h;
+        } else {
+            cout << "Помилка: висота повинна бути більше 0" << endl;
         }
-        return *this;
     }
 
-    ~DoubleVector() { delete[] data; vectorObjects--; }
-
-    void set(int idx, double val = 0.0) {
-        if (idx >= 0 && idx < size) data[idx] = val;
-        else state = OUT_OF_BOUNDS;
+    // Функція встановлення ширини
+    void setWidth(double w) {
+        if (w > 0) {
+            width = w;
+        } else {
+            cout << "Помилка: ширина повинна бути більше 0" << endl;
+        }
     }
 
-    double get(int idx) const {
-        if (idx >= 0 && idx < size) return data[idx];
-        const_cast<DoubleVector*>(this)->state = OUT_OF_BOUNDS;
-        return 0.0;
+    // Функція встановлення кольору
+    void setColor(string c) {
+        color = c;
     }
 
-    DoubleVector add(const DoubleVector& other) {
-        if (size != other.size) { state = INCOMPATIBLE_DIM; return *this; }
-        DoubleVector res(size);
-        for (int i = 0; i < size; i++) res.data[i] = data[i] + other.data[i];
-        return res;
+    // Функція отримання висоти
+    double getHeight() {
+        return height;
     }
 
-    void mult(double scalar) {
-        for (int i = 0; i < size; i++) data[i] *= scalar;
+    // Функція отримання ширини
+    double getWidth() {
+        return width;
     }
 
-    void print() const {
-        cout << "  Вектор (розмір " << size << ", стан " << state << "): [ ";
-        for (int i = 0; i < size; i++) cout << data[i] << (i == size - 1 ? "" : ", ");
-        cout << " ]" << endl;
+    // Функція отримання кольору
+    string getColor() {
+        return color;
+    }
+
+    // Обчислення площі
+    double calculateArea() {
+        double result;
+        result = height * width;
+        return result;
+    }
+
+    // Обчислення периметру
+    double calculatePerimeter() {
+        double result;
+        result = 2 * (height + width);
+        return result;
+    }
+
+    // Функція друку
+    void printInfo() {
+        cout << "------------------------------------" << endl;
+        cout << "Інформація про прямокутник:" << endl;
+        cout << "Висота: " << height << endl;
+        cout << "Ширина: " << width << endl;
+        cout << "Колір: " << color << endl;
+        cout << "Площа: " << calculateArea() << endl;
+        cout << "Периметр: " << calculatePerimeter() << endl;
+        cout << "------------------------------------" << endl;
     }
 };
-int DoubleVector::vectorObjects = 0;
 
 
-class DoubleMatrix {
+class Vector {
 private:
-    double* data;
-    int rows, cols;
-    int state;
-    static int matrixObjects;
+    double* data;     // Вказівник на масив
+    int size;         // Розмір
+    int state;        // Стан (0 - ок, 1 - помилка)
+    static int count; // Лічильник об'єктів
 
 public:
-    static int getCount() { return matrixObjects; }
-
-    DoubleMatrix() : rows(4), cols(3), state(OK) {
-        data = new (nothrow) double[rows * cols]();
-        if (!data) state = MEMORY_ERR;
-        matrixObjects++;
+    // Отримати кількість об'єктів
+    static int getCount() {
+        return count;
     }
 
-    DoubleMatrix(int n, int m, double val) : rows(n), cols(m), state(OK) {
-        data = new (nothrow) double[rows * cols];
-        if (!data) state = MEMORY_ERR;
-        else for (int i = 0; i < rows * cols; i++) data[i] = val;
-        matrixObjects++;
+    // Конструктор без параметрів
+    Vector() {
+        size = 1;
+        data = new double[size];
+        data[0] = 0.0;
+        state = 0;
+        count++;
     }
 
-    DoubleMatrix(const DoubleMatrix& other) : rows(other.rows), cols(other.cols), state(other.state) {
+    // Конструктор з одним параметром
+    Vector(int n) {
+        if (n <= 0) {
+            size = 1;
+            state = 1; // Помилка розміру
+        } else {
+            size = n;
+            state = 0;
+        }
+        data = new double[size];
+        for (int i = 0; i < size; i++) {
+            data[i] = 0.0;
+        }
+        count++;
+    }
+
+    // Конструктор з двома параметрами
+    Vector(int n, double value) {
+        if (n <= 0) {
+            size = 1;
+            state = 1;
+        } else {
+            size = n;
+            state = 0;
+        }
+        data = new double[size];
+        for (int i = 0; i < size; i++) {
+            data[i] = value;
+        }
+        count++;
+    }
+
+    // Конструктор копій
+    Vector(const Vector& other) {
+        size = other.size;
+        state = other.state;
+        data = new double[size];
+        for (int i = 0; i < size; i++) {
+            data[i] = other.data[i];
+        }
+        count++;
+    }
+
+    // Деструктор
+    ~Vector() {
+        delete[] data;
+        count--;
+    }
+
+    // Функція присвоєння значення елементу
+    void setElement(int index, double val) {
+        if (index >= 0 && index < size) {
+            data[index] = val;
+            state = 0;
+        } else {
+            state = 1; // Вихід за межі
+            cout << "Помилка: Індекс поза межами!" << endl;
+        }
+    }
+
+    // Одержання елемента
+    double getElement(int index) {
+        if (index >= 0 && index < size) {
+            return data[index];
+        } else {
+            state = 1;
+            return 0.0;
+        }
+    }
+
+    // Додавання векторів
+    Vector add(Vector& other) {
+        if (size != other.size) {
+            cout << "Помилка: розміри не збігаються!" << endl;
+            Vector empty(1);
+            empty.state = 1;
+            return empty;
+        }
+        Vector result(size);
+        for (int i = 0; i < size; i++) {
+            result.data[i] = data[i] + other.data[i];
+        }
+        return result;
+    }
+
+    // Віднімання векторів
+    Vector subtract(Vector& other) {
+        if (size != other.size) {
+            cout << "Помилка: розміри не збігаються!" << endl;
+            Vector empty(1);
+            empty.state = 1;
+            return empty;
+        }
+        Vector result(size);
+        for (int i = 0; i < size; i++) {
+            result.data[i] = data[i] - other.data[i];
+        }
+        return result;
+    }
+
+    // Множення на скаляр
+    void multiplyByScalar(double scalar) {
+        for (int i = 0; i < size; i++) {
+            data[i] = data[i] * scalar;
+        }
+    }
+
+    // Ділення на скаляр
+    void divideByScalar(double scalar) {
+        if (scalar == 0) {
+            state = 1;
+            cout << "Помилка: ділення на нуль!" << endl;
+            return;
+        }
+        for (int i = 0; i < size; i++) {
+            data[i] = data[i] / scalar;
+        }
+    }
+
+    // Функції порівняння
+    bool isMore(Vector& other) {
+        if (size > other.size) return true;
+        return false;
+    }
+
+    bool isLess(Vector& other) {
+        if (size < other.size) return true;
+        return false;
+    }
+
+    bool isEqual(Vector& other) {
+        if (size != other.size) return false;
+        for (int i = 0; i < size; i++) {
+            if (data[i] != other.data[i]) return false;
+        }
+        return true;
+    }
+
+    // Друк вектора
+    void print() {
+        cout << "Вектор (стан: " << state << "): [ ";
+        for (int i = 0; i < size; i++) {
+            cout << data[i] << " ";
+        }
+        cout << "]" << endl;
+    }
+};
+int Vector::count = 0;
+
+
+class Matrix {
+private:
+    double* data;
+    int rows;
+    int cols;
+    int state;
+    static int count;
+
+public:
+    static int getCount() {
+        return count;
+    }
+
+    // Без параметрів (4 на 3)
+    Matrix() {
+        rows = 4;
+        cols = 3;
         data = new double[rows * cols];
-        for (int i = 0; i < rows * cols; i++) data[i] = other.data[i];
-        matrixObjects++;
+        for (int i = 0; i < rows * cols; i++) {
+            data[i] = 0.0;
+        }
+        state = 0;
+        count++;
     }
 
-    ~DoubleMatrix() { delete[] data; matrixObjects--; }
-
-    void set(int i, int j, double val = 0.0) {
-        if (i >= 0 && i < rows && j >= 0 && j < cols) data[i * cols + j] = val;
-        else state = OUT_OF_BOUNDS;
+    // Квадратна матриця n на n
+    Matrix(int n) {
+        rows = n;
+        cols = n;
+        data = new double[rows * cols];
+        for (int i = 0; i < rows * cols; i++) {
+            data[i] = 0.0;
+        }
+        state = 0;
+        count++;
     }
 
-    double get(int i, int j) const {
-        if (i >= 0 && i < rows && j >= 0 && j < cols) return data[i * cols + j];
-        const_cast<DoubleMatrix*>(this)->state = OUT_OF_BOUNDS;
+    // Матриця n на m
+    Matrix(int n, int m, double value) {
+        rows = n;
+        cols = m;
+        data = new double[rows * cols];
+        for (int i = 0; i < rows * cols; i++) {
+            data[i] = value;
+        }
+        state = 0;
+        count++;
+    }
+
+    // Конструктор копій
+    Matrix(const Matrix& other) {
+        rows = other.rows;
+        cols = other.cols;
+        state = other.state;
+        data = new double[rows * cols];
+        for (int i = 0; i < rows * cols; i++) {
+            data[i] = other.data[i];
+        }
+        count++;
+    }
+
+    // Деструктор
+    ~Matrix() {
+        delete[] data;
+        count--;
+    }
+
+    // Присвоїти значення
+    void setElement(int i, int j, double val) {
+        if (i >= 0 && i < rows && j >= 0 && j < cols) {
+            data[i * cols + j] = val;
+        } else {
+            state = 1;
+        }
+    }
+
+    // Отримати значення
+    double getElement(int i, int j) {
+        if (i >= 0 && i < rows && j >= 0 && j < cols) {
+            return data[i * cols + j];
+        }
+        state = 1;
         return 0.0;
     }
 
-    void print() const {
-        cout << "  Матриця " << rows << "x" << cols << " (Стан: " << state << "):" << endl;
+    // Додавання матриць
+    Matrix add(Matrix& other) {
+        if (rows != other.rows || cols != other.cols) {
+            Matrix empty(1);
+            empty.state = 1;
+            return empty;
+        }
+        Matrix result(rows, cols, 0);
+        for (int i = 0; i < rows * cols; i++) {
+            result.data[i] = data[i] + other.data[i];
+        }
+        return result;
+    }
+
+    // Множення на скаляр
+    void multiplyByScalar(double scalar) {
+        for (int i = 0; i < rows * cols; i++) {
+            data[i] = data[i] * scalar;
+        }
+    }
+
+    // Друк матриці
+    void print() {
+        cout << "Матриця " << rows << "x" << cols << ":" << endl;
         for (int i = 0; i < rows; i++) {
-            cout << "    ";
-            for (int j = 0; j < cols; j++) cout << setw(8) << get(i, j);
+            for (int j = 0; j < cols; j++) {
+                cout << getElement(i, j) << "\t";
+            }
             cout << endl;
         }
     }
 };
-int DoubleMatrix::matrixObjects = 0;
+int Matrix::count = 0;
 
 
 
-void clearScreen() {
-#ifdef _WIN32
-    system("cls");
-#else
-    system("clear");
-#endif
+void showMenu() {
+    cout << "1. Тестувати клас Прямокутник" << endl;
+    cout << "2. Тестувати клас Вектор" << endl;
+    cout << "3. Тестувати клас Матриця" << endl;
+    cout << "0. Вийти з програми" << endl;
+    cout << "========================================" << endl;
+    cout << "Ваш вибір: ";
 }
 
-void runTask1() {
-    clearScreen();
+void testRectangle() {
+    cout << "\n--- ТЕСТУВАННЯ ПРЯМОКУТНИКА ---" << endl;
 
-    cout << "1. Введення з клавіатури\n2. Випадкові дані\nВибір: ";
-    int c; cin >> c;
-    if (c == 1) {
-        double h, w; string col;
-        cout << "Висота Ширина Колір: "; cin >> h >> w >> col;
-        Rectangle r(h, w, col); r.print();
+    // Спосіб 1: Клавіатура
+    double h, w;
+    string c;
+    cout << "Введіть висоту: "; cin >> h;
+    cout << "Введіть ширину: "; cin >> w;
+    cout << "Введіть колір: "; cin >> c;
+    Rectangle r1(h, w, c);
+    r1.printInfo();
+
+    // Спосіб 2: Рандом
+    cout << "Генерація випадкового прямокутника..." << endl;
+    Rectangle r2(rand() % 20 + 1, rand() % 20 + 1, "Green");
+    r2.printInfo();
+
+    // Спосіб 3: Файл
+    cout << "Спроба прочитати з файлу rect.txt..." << endl;
+    ifstream fin("rect.txt");
+    if (fin.is_open()) {
+        fin >> h >> w >> c;
+        Rectangle r3(h, w, c);
+        r3.printInfo();
+        fin.close();
     } else {
-        Rectangle r(rand()%15+1, rand()%15+1, "Random_Color"); r.print();
+        cout << "Файл не знайдено, пропускаємо." << endl;
     }
-    cout << "\nНатисніть будь-яку клавішу..."; cin.ignore(); cin.get();
 }
 
-void runTask2() {
-    clearScreen();
-    cout << "=== ТЕСТУВАННЯ: ВЕКТОР ===\n";
-    DoubleVector v1(5, 2.5);
-    DoubleVector v2(5, 1.5);
+void testVector() {
+    cout << "\n--- ТЕСТУВАННЯ ВЕКТОРА ---" << endl;
+    int n;
+    cout << "Введіть розмір вектора: "; cin >> n;
+    Vector v1(n, 5.0);
+    Vector v2(n, 10.0);
+
     cout << "Вектор 1: "; v1.print();
     cout << "Вектор 2: "; v2.print();
-    DoubleVector v3 = v1.add(v2);
-    cout << "Результат додавання: "; v3.print();
-    cout << "Кількість активних векторів: " << DoubleVector::getCount() << endl;
-    cout << "\nНатисніть будь-яку клавішу..."; cin.ignore(); cin.get();
+
+    Vector v3 = v1.add(v2);
+    cout << "Сума векторів: "; v3.print();
+
+    v1.multiplyByScalar(2.0);
+    cout << "Вектор 1 після множення на 2: "; v1.print();
+
+    cout << "Кількість векторів у системі: " << Vector::getCount() << endl;
 }
 
-void runTask3() {
-    clearScreen();
-    cout << "=== ТЕСТУВАННЯ: МАТРИЦЯ ===\n";
-    DoubleMatrix m(3, 3, 1.0);
-    m.set(1, 1, 55.5);
-    m.print();
-    cout << "Кількість активних матриць: " << DoubleMatrix::getCount() << endl;
-    cout << "\nНатисніть будь-яку клавішу"; cin.ignore(); cin.get();
+void testMatrix() {
+    cout << "\n--- ТЕСТУВАННЯ МАТРИЦІ ---" << endl;
+    Matrix m1(2, 2, 1.0);
+    m1.setElement(0, 0, 5.0);
+    m1.setElement(0, 1, 10.0);
+    m1.setElement(1, 0, 15.0);
+    m1.setElement(1, 1, 20.0);
+
+    m1.print();
+
+    Matrix m2 = m1; // Копія
+    cout << "Копія матриці:" << endl;
+    m2.print();
+
+    cout << "Кількість матриць у системі: " << Matrix::getCount() << endl;
 }
 
 int main() {
+    // Для підтримки української мови в консолі
+    setlocale(LC_ALL, "Ukrainian");
+    // Ініціалізація рандому
     srand(time(0));
-    while (true) {
-        clearScreen();
-        cout << " 1. Задача 1.3 (Прямокутник)\n";
-        cout << " 2. Задача 2.3 (Вектор)\n";
-        cout << " 3. Задача 3.3 (Матриця)\n";
-        cout << "Ваш вибір: ";
-        int choice;
-        if (!(cin >> choice)) break;
-        if (choice == 1) runTask1();
-        else if (choice == 2) runTask2();
-        else if (choice == 3) runTask3();
-        else if (choice == 0) break;
+
+    int choice = -1;
+
+    // Цикл меню
+    while (choice != 0) {
+        showMenu();
+        cin >> choice;
+
+        if (choice == 1) {
+            testRectangle();
+        }
+        else if (choice == 2) {
+            testVector();
+        }
+        else if (choice == 3) {
+            testMatrix();
+        }
+        else if (choice == 0) {
+            cout << "Вихід з програми..." << endl;
+        }
+        else {
+            cout << "Невірний вибір! Спробуйте ще раз." << endl;
+        }
+
+        cout << "\nНатисніть будь-яку клавішу для продовження...";
+        cin.ignore();
+        cin.get();
+#ifdef _WIN32
+        system("cls");
+#else
+        system("clear");
+#endif
     }
+
     return 0;
 }
